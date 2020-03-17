@@ -1,15 +1,14 @@
 package cmd
 
 import (
-
+	"fmt"
+	"github.com/nyudlts/go-aspace"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/nyudlts/go-aspace"
 	"log"
 )
 
 var (
-
 	rootCmd = &cobra.Command{
 		Use: "fa-random",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -37,6 +36,7 @@ func er(e error) {
 }
 
 func generateEADXML() {
+	fmt.Printf("** Generating %d EAD files\n", viper.GetInt("count"))
 	ASpaceClient, err := go_aspace.NewClient(20)
 	er(err)
 
@@ -48,14 +48,10 @@ func generateEADXML() {
 		repositoryId := repositories[j]
 		resources, err := ASpaceClient.GetResourceIDsByRepository(repositoryId)
 		er(err)
-		resourceId := resources[go_aspace.RandInt(0,len(resources))]
+		resourceId := resources[go_aspace.RandInt(0, len(resources))]
+		fmt.Printf("**   Exporting %d_%d.xml\n", repositoryId, resourceId)
 		err = ASpaceClient.SerializeEAD(repositoryId, resourceId, viper.GetString("output-dir"))
 		er(err)
 	}
-
-
-
+	fmt.Println("** export complete")
 }
-
-
-
